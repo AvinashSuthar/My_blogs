@@ -25,6 +25,17 @@ userRouter.post("/signup", async (c) => {
         msg: "inputs are invalid",
       });
     }
+    const exists = await prisma.user.findFirst({
+      where: {
+        email: body.email,
+      },
+    });
+    if (exists) {
+      c.status(400);
+      return c.json({
+        msg: "User already exists",
+      });
+    }
     const user = await prisma.user.create({
       data: {
         email: body.email,
@@ -37,7 +48,8 @@ userRouter.post("/signup", async (c) => {
 
     return c.json({ jwt: token });
   } catch (error) {
-    c.status(403);
+    console.log(error);
+    c.status(411);
     return c.json({
       msg: "Error",
     });
